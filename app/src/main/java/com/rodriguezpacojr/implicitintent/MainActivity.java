@@ -38,15 +38,15 @@ public class MainActivity extends AppCompatActivity {
     void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnCall:
-                makeACall();
+                alertDialog("makeACall", "Phone", 2, "Type a number");
                 break;
 
             case R.id.btnMail:
-                sendEmail();
+                alertDialog("sendEmail", "Email", 1, "Type a email");
                 break;
 
             case R.id.btnSms:
-                sendSms();
+                alertDialog("sendSms", "Phone", 2, "Type a number");
                 break;
 
             case R.id.btnWeb:
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.btnSearch:
-                search();
+                alertDialog("search", "Word", 1, "Type a word");
                 break;
 
             case R.id.btnAlarm:
@@ -87,94 +87,68 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.btnPlay:
-                play();
+                alertDialog("play", "Artist", 1, "Type an Artist");
                 break;
         }
     }
 
-    private void makeACall() {
+    private void alertDialog(final String action, String hint, int inputType, final String message) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_alert, null);
-        final EditText editText = (EditText) mView.findViewById(R.id.editText);
-        TextView textView = (TextView) mView.findViewById(R.id.textView);
-        textView.setText("Phone");
-        editText.setInputType(2);
-        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
 
+        final EditText editText = (EditText) mView.findViewById(R.id.editText);
+
+        TextView textView = (TextView) mView.findViewById(R.id.textView);
+
+        textView.setText(hint);
+        editText.setHint(hint);
+        editText.setInputType(inputType);
+
+        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editText.getText().toString().length() < 10 && editText.getText().toString().length() > 0)
                     Toast.makeText(MainActivity.this, "Type 10 digits", Toast.LENGTH_SHORT).show();
                 else if (!editText.getText().toString().isEmpty()) {
-                    Intent intCall = new Intent(Intent.ACTION_CALL);
-                    intCall.setData(Uri.parse("tel:"+editText.getText().toString()));
+                    if (action.equals("makeACall")) {
+                        Intent intCall = new Intent(Intent.ACTION_CALL);
+                        intCall.setData(Uri.parse("tel:"+editText.getText().toString()));
 
-                    if (intCall.resolveActivity(getPackageManager()) != null)
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
-                            return;
-                    startActivity(intCall);
+                        if (intCall.resolveActivity(getPackageManager()) != null)
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                                return;
+                        startActivity(intCall);
+                    }
+                    else if (action.equals("sendEmail")) {
+                        Intent intMail = new Intent(Intent.ACTION_SEND);
+                        intMail.setType("text/plain");
+                        intMail.putExtra(intMail.EXTRA_EMAIL, new String[]{editText.getText().toString()});
+                        startActivity(intMail);
+                    }
+                    else if (action.equals("sendSms")) {
+                        Intent intSms = new Intent(Intent.ACTION_SENDTO);
+                        intSms.setData(Uri.parse("sms: "+editText.getText().toString()));
+                        intSms.putExtra("sms_body","");
+                        startActivity(intSms);
+                    }
+                    else if (action.equals("search")) {
+                        Intent intSearch= new Intent(Intent.ACTION_WEB_SEARCH );
+                        intSearch.putExtra(SearchManager.QUERY, editText.getText().toString());
+                        startActivity(intSearch);
+                    }
+                    else if (action.equals("play")) {
+                        Intent intPlay = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                        intPlay.putExtra(MediaStore.EXTRA_MEDIA_FOCUS,
+                                MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE);
+                        intPlay.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, editText.getText().toString());
+                        intPlay.putExtra(SearchManager.QUERY, editText.getText().toString());
+                        if (intPlay.resolveActivity(getPackageManager()) != null)
+                            startActivity(intPlay);
+                    }
                 }
                 else
-                    Toast.makeText(MainActivity.this, "Set Phone", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
-    }
-
-    private void sendEmail() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_alert, null);
-        final EditText editText = (EditText) mView.findViewById(R.id.editText);
-        TextView textView = (TextView) mView.findViewById(R.id.textView);
-        textView.setText("Email");
-        editText.setHint("Email");
-        editText.setInputType(1);
-        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!editText.getText().toString().isEmpty()) {
-                    Intent intMail = new Intent(Intent.ACTION_SEND);
-                    intMail.setType("text/plain");
-                    intMail.putExtra(intMail.EXTRA_EMAIL, new String[]{editText.getText().toString()});
-
-                    startActivity(intMail);
-                }
-                else
-                    Toast.makeText(MainActivity.this, "Set Email", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
-    }
-
-    private void sendSms() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_alert, null);
-        final EditText editText = (EditText) mView.findViewById(R.id.editText);
-        TextView textView = (TextView) mView.findViewById(R.id.textView);
-        textView.setText("Phone");
-        editText.setInputType(2);
-        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (editText.getText().toString().length() < 10 && editText.getText().toString().length() > 0)
-                    Toast.makeText(MainActivity.this, "Type 10 digits", Toast.LENGTH_SHORT).show();
-                else if (!editText.getText().toString().isEmpty()) {
-                    Intent intSms = new Intent(Intent.ACTION_SENDTO);
-                    intSms.setData(Uri.parse("sms: "+editText.getText().toString()));
-                    intSms.putExtra("sms_body","Hello");
-                    startActivity(intSms);
-                }
-                else
-                    Toast.makeText(MainActivity.this, "Set Phone", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
         mBuilder.setView(mView);
@@ -204,63 +178,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                     Toast.makeText(MainActivity.this, "Fill All Fields", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
-    }
-
-    private void search() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_alert, null);
-        final EditText editText = (EditText) mView.findViewById(R.id.editText);
-        TextView textView = (TextView) mView.findViewById(R.id.textView);
-        textView.setText("Key Word");
-        editText.setInputType(1);
-        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!editText.getText().toString().isEmpty()) {
-                    Intent intSearch= new Intent(Intent.ACTION_WEB_SEARCH );
-                    intSearch.putExtra(SearchManager.QUERY, editText.getText().toString());
-                    startActivity(intSearch);
-                }
-                else
-                    Toast.makeText(MainActivity.this, "Type a word", Toast.LENGTH_SHORT).show();
-            }
-        });
-        mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
-    }
-
-    private void play() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_alert, null);
-        final EditText editText = (EditText) mView.findViewById(R.id.editText);
-        TextView textView = (TextView) mView.findViewById(R.id.textView);
-        textView.setText("Artist");
-        editText.setHint("Artist");
-        editText.setInputType(1);
-        Button btnOK = (Button) mView.findViewById(R.id.btnOK);
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!editText.getText().toString().isEmpty()) {
-                    Intent intPlay = new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                    intPlay.putExtra(MediaStore.EXTRA_MEDIA_FOCUS,
-                            MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE);
-                    intPlay.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, editText.getText().toString());
-                    intPlay.putExtra(SearchManager.QUERY, editText.getText().toString());
-                    if (intPlay.resolveActivity(getPackageManager()) != null)
-                        startActivity(intPlay);
-                }
-                else
-                    Toast.makeText(MainActivity.this, "Type an Artist", Toast.LENGTH_SHORT).show();
             }
         });
         mBuilder.setView(mView);
