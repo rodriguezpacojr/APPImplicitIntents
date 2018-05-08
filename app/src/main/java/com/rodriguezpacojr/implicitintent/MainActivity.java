@@ -25,6 +25,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
+    //HOLA VALERIA
     //TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,52 +41,41 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btnCall:
                 alertDialog("makeACall", "Phone", 2, "Type a number");
                 break;
-
             case R.id.btnMail:
                 alertDialog("sendEmail", "Email", 1, "Type a email");
                 break;
-
             case R.id.btnSms:
                 alertDialog("sendSms", "Phone", 2, "Type a number");
                 break;
-
             case R.id.btnWeb:
                 Intent intWeb= new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.itcelaya.edu.mx"));
                 startActivity(intWeb);
                 break;
-
             case R.id.btnPhoto:
                 Intent intCam = new Intent("android.media.action.IMAGE_CAPTURE");
                 startActivity(intCam);
                 break;
-
             case R.id.btnMap:
                 openMap();
                 break;
-
            case R.id.btnContacts:
                Intent intCont = new Intent();
                intCont.setAction(Intent.ACTION_VIEW);
                intCont.setData(Uri.parse("content://contacts/people/"));
                startActivity(intCont);
                 break;
-
             case R.id.btnSearch:
                 alertDialog("search", "Word", 1, "Type a word");
                 break;
-
             case R.id.btnAlarm:
                 setAlarm();
                 break;
-
             case R.id.btnReminder:
                 reminder();
                 break;
-
             case R.id.btnInsertContact:
                 insertContact();
                 break;
-
             case R.id.btnPlay:
                 alertDialog("play", "Artist", 1, "Type an Artist");
                 break;
